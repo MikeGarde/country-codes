@@ -1,0 +1,23 @@
+{
+  "name": "mikegarde/country-codes",
+  "description": "ISO 3166-1 Country Codes",
+  "type": "library",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "Mike Garde",
+      "email": "mgarde@gmail.com"
+    }
+  ],
+  "require": {
+    "respect/validation": "^1.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Country\\": "src/"
+    }
+  }
+}
