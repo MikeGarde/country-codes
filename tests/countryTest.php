@@ -1,6 +1,7 @@
 <?php namespace Country;
 
 use PHPUnit\Framework\TestCase;
+use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\AllOfException;
 
 class countryTest extends TestCase {
@@ -25,6 +26,25 @@ class countryTest extends TestCase {
 	{
 		$this->expectException(AllOfException::class);
 		new Country(['fail', 'array']);
+	}
+
+	public function testAltSpellings()
+	{
+		$altSpellings = include 'src/altSpellings.php';
+
+		foreach ($altSpellings as $alt => $iso)
+		{
+			$msg = '"%s" alt spelling "%s" has capitalization issues';
+			$msg = sprintf($msg, $iso, $alt);
+
+			$this->assertTrue(v::stringType()->lowercase()->validate($alt), $msg);
+			$this->assertTrue(v::stringType()->uppercase()->validate($iso), $msg);
+
+			$msg = '"%s" alt spelling "%s" has punctuation issues';
+			$msg = sprintf($msg, $iso, $alt);
+
+			$this->assertTrue(preg_match('/^[a-z ]+$/', $alt) === 1, $msg);
+		}
 	}
 
 	public function testGetCountry1()
@@ -55,8 +75,8 @@ class countryTest extends TestCase {
 		$this->assertEquals('SX', $results['iso2']);
 	}
 
-	public function testGetCountry3() {
-
+	public function testGetCountry3()
+	{
 		$country = new Country();
 
 		$results = $country->getCountry('Vatican');

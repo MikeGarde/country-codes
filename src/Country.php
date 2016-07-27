@@ -143,22 +143,8 @@ class Country {
 	 */
 	private function search($term)
 	{
-		$term   = strtolower($term);
+		$term = strtolower($term);
 		$term = preg_replace('/[^a-z ]+/', '', $term);
-
-		if (strlen($term) == 2)
-		{
-			$key = 'iso2';
-		}
-		elseif (strlen($term) == 3)
-		{
-			$key = 'iso3';
-		}
-		else
-		{
-			$key = 'name';
-		}
-
 
 		/*
 		 * Do we already know of an alternative spelling?
@@ -177,6 +163,18 @@ class Country {
 		/*
 		 * Final attempt, levenshtein math it
 		 */
+		if (strlen($term) == 2)
+		{
+			$key = 'iso2';
+		}
+		elseif (strlen($term) == 3)
+		{
+			$key = 'iso3';
+		}
+		else
+		{
+			$key = 'name';
+		}
 		$lowest = null;
 		$return = null;
 
@@ -190,6 +188,24 @@ class Country {
 				$lowest = $cost;
 				$return = $country;
 			}
+		}
+
+		similar_text($term, $return[ $key ], $percent);
+		if ($percent < 20)
+		{
+			return null;
+		}
+		if (preg_match("/$term/i", $return[ $key ]))
+		{
+			return $return;
+		}
+		if (preg_match("/$return[$key]/i", $term))
+		{
+			return $return;
+		}
+		if (($lowest / strlen($return[ $key ])) >= 6)
+		{
+			return null;
 		}
 
 		return $return;
