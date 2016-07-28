@@ -1,6 +1,8 @@
 <?php namespace Countries;
 
+use Respect\Validation\Exceptions\CountryCodeException;
 use Respect\Validation\Validator as v;
+use Respect\Validation\Exceptions\ComponentException;
 
 /**
  * This package is licensed under GPL-3.0
@@ -193,6 +195,84 @@ class Countries {
 		$results = $this->stripKey($results);
 
 		return $results;
+	}
+
+	/**
+	 * @param $term
+	 *
+	 * @return bool
+	 */
+	public function valid($term)
+	{
+		return ($this->getCountry($term)) ? true : false;
+	}
+
+	/**
+	 * @param $expected
+	 * @param $term
+	 *
+	 * @return bool
+	 */
+	public function validate($expected, $term)
+	{
+		v::stringType()->length(2, 3)->assert($expected);
+
+		$key    = 'iso' . strlen($expected);
+		$result = $this->getCountry($term);
+
+		return ($expected == $result[ $key ]) ? true : false;
+	}
+
+	/**
+	 * @param $expected
+	 * @param $term
+	 *
+	 * @return bool
+	 * @throws ComponentException
+	 */
+	public function assert($expected, $term)
+	{
+		v::stringType()->length(2, 3)->assert($expected);
+
+		$key    = 'iso' . strlen($expected);
+		$result = $this->getCountry($term);
+
+		// Utilizes Respect/Validation for consistency is thrown errors
+		if ($expected != $result[ $key ]) {
+			throw new ComponentException(sprintf('"%s" is not a valid country within ISO 3166-1', $term));
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param $term
+	 *
+	 * @return bool
+	 * @throws ComponentException
+	 */
+	public function assertValid($term)
+	{
+		// Utilizes Respect/Validation for consistency is thrown errors
+		if (!$this->getCountry($term)) {
+			throw new ComponentException(sprintf('"%s" is not a valid country within ISO 3166-1', $term));
+		}
+
+		return true;
+	}
+
+	/**
+	 * Is the country actually a US territory
+	 *
+	 * @param $term
+	 *
+	 * @return bool
+	 */
+	public function isUSTerritory($term)
+	{
+		$result = $this->getCountry($term);
+
+		return ($result['isUS']) ? true : false;
 	}
 
 	/**

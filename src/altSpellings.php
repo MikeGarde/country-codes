@@ -36,6 +36,7 @@ return [
 	'tristan da cunha'                   => 'SH',
 	'united kingdom'                     => 'GB',
 	'united states of america'           => 'US',
+	'united states virgin islands'       => 'VI',
 	'vatican'                            => 'VA',
 	'virgin islands british'             => 'VG',
 	'virgin islands us'                  => 'VI',

@@ -4,6 +4,7 @@ use PHPUnit\Framework\TestCase;
 use Countries\Countries;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\AllOfException;
+use Respect\Validation\Exceptions\ComponentException;
 
 class countryTest extends TestCase {
 
@@ -141,4 +142,66 @@ class countryTest extends TestCase {
 		$this->assertEquals(2, count($results));
 	}
 
+	public function testValidation()
+	{
+		$countries = new Countries();
+
+		$this->assertTrue($countries->validate('US', 'United States'));
+		$this->assertTrue($countries->validate('USA', 'United States'));
+		$this->assertFalse($countries->validate('US', 'Canada'));
+	}
+
+	public function testIsValid()
+	{
+		$countries = new Countries();
+
+		$this->assertTrue($countries->valid('United States'));
+		$this->assertFalse($countries->valid('United Front of Alien Planets'));
+	}
+
+	public function testAssertion()
+	{
+		$countries = new Countries();
+
+		$this->assertTrue($countries->assert('USA', 'United States'));
+	}
+
+	public function testAssertionFail()
+	{
+		$this->expectException(ComponentException::class);
+
+		$countries = new Countries();
+		$countries->assert('ZZ', 'United States');
+	}
+
+	public function testAssertValid()
+	{
+		$countries = new Countries();
+
+		$this->assertTrue($countries->assertValid('United States'));
+	}
+
+	public function testAssertValidFail()
+	{
+		$this->expectException(ComponentException::class);
+
+		$countries = new Countries();
+		$countries->assertValid('Not A Country (yet)');
+	}
+
+	public function testUSTerritories()
+	{
+		$countries = new Countries();
+
+		$this->assertTrue($countries->isUSTerritory('Guam'));
+		$this->assertTrue($countries->isUSTerritory('Northern Mariana Islands'));
+		$this->assertTrue($countries->isUSTerritory('Puerto Rico'));
+		$this->assertTrue($countries->isUSTerritory('US Virgin Islands'));
+		$this->assertTrue($countries->isUSTerritory('Micronesia'));
+		$this->assertTrue($countries->isUSTerritory('Northern Mariana Islands'));
+		$this->assertTrue($countries->isUSTerritory('Palau'));
+		$this->assertTrue($countries->isUSTerritory('American Samoa'));
+		$this->assertTrue($countries->isUSTerritory('PR'));
+		$this->assertFalse($countries->isUSTerritory('Canada'));
+	}
 }
