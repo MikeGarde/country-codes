@@ -1,19 +1,18 @@
-<?php namespace Country;
+<?php
 
 use PHPUnit\Framework\TestCase;
-use Respect\Validation\Validator as v;
-use Respect\Validation\Exceptions\AllOfException;
+use Countries\Countries;
 
 class dataSetTest extends TestCase {
 
 	public function testConstruction()
 	{
-		$country = new Country();
+		$countries = new Countries();
 		$dataSet = include 'dataSet.php';
 
 		foreach ($dataSet as $term => $desired)
 		{
-			$result = $country->getCountry($term);
+			$result = $countries->getCountry($term);
 			$msg    = '"%s" was expecting iso "%s" but got "%s" for "%s"';
 			$msg    = sprintf($msg, $term, $desired, $result['iso2'], $result['name']);
 

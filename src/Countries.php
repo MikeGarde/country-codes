@@ -1,4 +1,4 @@
-<?php namespace Country;
+<?php namespace Countries;
 
 use Respect\Validation\Validator as v;
 
@@ -14,7 +14,7 @@ use Respect\Validation\Validator as v;
  * @link http://www.iso.org/iso/home/standards/country_codes.htm
  * @link http://www.iso.org/iso/home/store/licence_agreement.htm
  */
-class Country {
+class Countries {
 
 	private $sortOrder = 'name';
 	private $pref      = [
@@ -32,23 +32,46 @@ class Country {
 		'isUK',
 		'isUS',
 	];
-	private $strict;
+	private $strict    = false;
 	private $isoDetails;
+	private $altSpellings;
 
+	/**
+	 * Countries constructor.
+	 *
+	 * @param array $pref
+	 * @param bool  $strict
+	 */
 	public function __construct($pref = [], $strict = false)
 	{
-		if (v::arrayType()->assert($pref))
-		{
-			v::arrayVal()->each(v::in($this->availPref))->assert($pref);
-			$this->pref = $pref;
-		}
-
+		$this->setPref($pref);
 		v::type('bool')->assert($strict);
 
 		$this->strict     = $strict;
 		$this->isoDetails = include 'isoDetails.php';
 	}
 
+	/**
+	 * Sets Preferences of what you want returned
+	 *
+	 * @param $pref
+	 */
+	public function setPref($pref)
+	{
+		if (v::arrayType()->assert($pref))
+		{
+			v::arrayVal()->each(v::in($this->availPref))->assert($pref);
+			if ($pref) {
+				$this->pref = $pref;
+			}
+		}
+	}
+
+	/**
+	 * Set the preferred sort order of returned countries
+	 *
+	 * @param $key
+	 */
 	public function setSort($key)
 	{
 		v::contains($key)->assert($this->availPref);
@@ -56,87 +79,127 @@ class Country {
 		$this->sortOrder = $key;
 	}
 
+	/**
+	 * Broad but comprehensive search
+	 *
+	 * @param $term
+	 *
+	 * @return null|array
+	 */
 	public function getCountry($term)
 	{
-		$return = null;
+		$results = null;
 
 		if (v::stringType()->length(2, 3)->validate($term))
 		{
-			$return = $this->getCountryFromISO($term);
+			$results = $this->getCountryFromISO($term);
 		}
 		else
 		{
-			$return = $this->getCountryFromName($term);
+			$results = $this->getCountryFromName($term);
 		}
 
-		if ($this->strict || $return)
+		if ($this->strict || $results)
 		{
-			return $return;
+			return $this->formatResults($results);
 		}
 
 		if (v::not(v::intVal())->validate($term))
 		{
-			return $this->search($term);
+			$results = $this->search($term);;
+
+			return $this->formatResults($results);
 		}
 
 		return null;
 	}
 
+	/**
+	 * Provide 2 or 3 letter ISO and get the country
+	 *
+	 * @param $term
+	 *
+	 * @return null|array
+	 */
 	public function getCountryFromISO($term)
 	{
 		v::stringType()->length(2, 3)->assert($term);
 
 		if (v::intVal()->validate($term))
 		{
-			return $this->findByKey('isoNum', $term);
+			$results = $this->findByKey('isoNum', $term);
 		}
 		elseif (strlen($term) == 2)
 		{
-			return $this->findByKey('iso2', $term);
+			$results = $this->findByKey('iso2', $term);
 		}
 		else
 		{
-			return $this->findByKey('iso3', $term);
+			$results = $this->findByKey('iso3', $term);
 		}
+
+		return $this->formatResults($results);
 	}
 
+	/**
+	 * Provide a name (must be an exact match)
+	 *
+	 * @param $term
+	 *
+	 * @return null|array
+	 */
 	public function getCountryFromName($term)
 	{
 		v::stringType()->notEmpty()->assert($term);
 
-		return $this->findByKey('name', $term);
+		$results = $this->findByKey('name', $term);
+
+		return $this->formatResults($results);
 	}
 
-	public function getNameFromISO($iso)
+	private function getNameFromISO($iso)
 	{
 	}
 
-	public function getISOFromName($name)
+	private function getISOFromName($name)
 	{
-	}
-
-	public function getAllCountries()
-	{
-		$return = $this->sort($this->isoDetails);
-
-		return $return;
-	}
-
-	public function getAllCountryNames()
-	{
-		$return = [];
-
-		foreach ($this->isoDetails as $country)
-		{
-			$return[] = $country['name'];
-		}
-
-		asort($return);
-
-		return $this->stripKey($return);
 	}
 
 	/**
+	 * All countries
+	 *
+	 * @return array
+	 */
+	public function getAllCountries()
+	{
+		$results = $this->sort($this->isoDetails);
+
+		return $this->formatResults($results);
+	}
+
+	/**
+	 * Get just the names of all countries
+	 *
+	 * @return array
+	 */
+	public function getAllCountryNames()
+	{
+		$results = [];
+
+		foreach ($this->isoDetails as $country)
+		{
+			$results[] = $country['name'];
+		}
+
+		asort($results);
+		$results = $this->stripKey($results);
+
+		return $results;
+	}
+
+	/**
+	 * Internal search for when exact matches were not found
+	 *
 	 * @param $term
 	 *
 	 * @return null
@@ -161,7 +224,7 @@ class Country {
 
 
 		/*
-		 * Final attempt, levenshtein math it
+		 * Final attempt, Levenshtein math it
 		 */
 		if (strlen($term) == 2)
 		{
@@ -175,8 +238,8 @@ class Country {
 		{
 			$key = 'name';
 		}
-		$lowest = null;
-		$return = null;
+		$lowest  = null;
+		$results = null;
 
 		foreach ($this->isoDetails as $country)
 		{
@@ -185,30 +248,33 @@ class Country {
 
 			if ($cost < $lowest || $lowest === null)
 			{
-				$lowest = $cost;
-				$return = $country;
+				$lowest  = $cost;
+				$results = $country;
 			}
 		}
 
-		similar_text($term, $return[ $key ], $percent);
+		/*
+		 * Decide if we have respectable results
+		 */
+		similar_text($term, $results[ $key ], $percent);
 		if ($percent < 20)
 		{
 			return null;
 		}
-		if (preg_match("/$term/i", $return[ $key ]))
+		if (preg_match("/$term/i", $results[ $key ]))
 		{
-			return $return;
+			return $results;
 		}
-		if (preg_match("/$return[$key]/i", $term))
+		if (preg_match("/$results[$key]/i", $term))
 		{
-			return $return;
+			return $results;
 		}
-		if (($lowest / strlen($return[ $key ])) >= 6)
+		if (($lowest / strlen($results[ $key ])) >= 6)
 		{
 			return null;
 		}
 
-		return $return;
+		return $results;
 	}
 
 	/**
@@ -271,4 +337,30 @@ class Country {
 		return $return;
 	}
 
+	/**
+	 * @param $results
+	 *
+	 * @return null|array
+	 */
+	private function formatResults($results)
+	{
+		if ($results === null)
+		{
+			return null;
+		}
+
+		foreach ($results as $key => $item)
+		{
+			if (is_array($item))
+			{
+				$results[ $key ] = $this->formatResults($item);
+			}
+			elseif (!in_array($key, $this->pref))
+			{
+				unset($results[ $key ]);
+			}
+		}
+
+		return $results;
+	}
 }
