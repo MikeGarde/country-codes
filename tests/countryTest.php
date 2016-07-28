@@ -53,7 +53,7 @@ class countryTest extends TestCase {
 		$countries = new Countries();
 		$results   = $countries->getCountry('United States');
 
-		$this->assertEquals($results['iso2'], 'US');
+		$this->assertEquals('US', $results['iso2']);
 	}
 
 	public function testGetCountry2()

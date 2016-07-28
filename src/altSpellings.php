@@ -7,6 +7,7 @@ return [
 	'brunei darussalam'                  => 'BN',
 	'canary islands'                     => 'ES',
 	'cape verde islands'                 => 'CV',
+	'congo'                              => 'CG',
 	'congo democratic republic'          => 'CG',
 	'cote divoire'                       => 'CI',
 	'england'                            => 'GB',

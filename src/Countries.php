@@ -61,9 +61,7 @@ class Countries {
 		if (v::arrayType()->assert($pref))
 		{
 			v::arrayVal()->each(v::in($this->availPref))->assert($pref);
-			if ($pref) {
-				$this->pref = $pref;
-			}
+			$this->pref = ($pref) ?: $this->availPref;
 		}
 	}
 

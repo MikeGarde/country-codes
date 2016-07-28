@@ -7,6 +7,7 @@ return [
 	'nation of brunei'                          => 'BN',
 	'canary islands'                            => 'ES',
 	'cape verde islands'                        => 'CV',
+	'congo'                                     => 'CG',
 	'egype'                                     => 'EG',
 	'england'                                   => 'GB',
 	'france metropolitan'                       => 'FR',
