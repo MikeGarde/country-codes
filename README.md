@@ -47,16 +47,12 @@ $results   = $countries->getAllCountries();
 return json_encode($results);
 ```
 
-Don't need so much info?
+US Territory?
 
 ```php
-$countries = new Countries(['name', 'iso2']);
-$result    = $countries->getCountry('US');
-
-/*
-$result = [
-    'name'    => 'United States',
-    'iso2'    => 'US',
-];
-*/
+$countries = new Countries(true);
+if ($countries->isUSTerritory('PR'))
+{
+    echo 'Yep, a US Territory';
+}
 ```

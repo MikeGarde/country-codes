@@ -13,11 +13,6 @@ class countryTest extends TestCase {
 		new Countries();
 	}
 
-	public function testPrefConstruction()
-	{
-		new Countries(['name', 'iso2']);
-	}
-
 	public function testExceptionConstruction()
 	{
 		$this->expectException(AllOfException::class);
@@ -120,26 +115,6 @@ class countryTest extends TestCase {
 		$this->expectException(AllOfException::class);
 		$countries = new Countries();
 		$countries->setSort('bad');
-	}
-
-	public function testPreferences()
-	{
-		$preferences = ['name', 'iso2'];
-		$countries   = new Countries($preferences);
-
-		$results = $countries->getCountry('United States of America');
-
-		$this->assertEquals('US', $results['iso2']);
-		$this->assertEquals('United States', $results['name']);
-		$this->assertEquals(2, count($results));
-
-
-		$countries->setPref(['name', 'iso3']);
-		$results = $countries->getCountry('UnitedStates');
-
-		$this->assertEquals('USA', $results['iso3']);
-		$this->assertEquals('United States', $results['name']);
-		$this->assertEquals(2, count($results));
 	}
 
 	public function testValidation()

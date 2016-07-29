@@ -19,11 +19,7 @@ use Respect\Validation\Exceptions\ComponentException;
 class Countries {
 
 	private $sortOrder = 'name';
-	private $pref      = [
-		'name',
-		'iso2',
-	];
-	private $availPref = [
+	private $availSort = [
 		'name',
 		'iso2',
 		'iso3',
@@ -41,30 +37,14 @@ class Countries {
 	/**
 	 * Countries constructor.
 	 *
-	 * @param array $pref
 	 * @param bool  $strict
 	 */
-	public function __construct($pref = [], $strict = false)
+	public function __construct($strict = false)
 	{
-		$this->setPref($pref);
 		v::type('bool')->assert($strict);
 
 		$this->strict     = $strict;
 		$this->isoDetails = include 'isoDetails.php';
-	}
-
-	/**
-	 * Sets Preferences of what you want returned
-	 *
-	 * @param $pref
-	 */
-	public function setPref($pref)
-	{
-		if (v::arrayType()->assert($pref))
-		{
-			v::arrayVal()->each(v::in($this->availPref))->assert($pref);
-			$this->pref = ($pref) ?: $this->availPref;
-		}
 	}
 
 	/**
@@ -74,7 +54,7 @@ class Countries {
 	 */
 	public function setSort($key)
 	{
-		v::contains($key)->assert($this->availPref);
+		v::contains($key)->assert($this->availSort);
 
 		$this->sortOrder = $key;
 	}
@@ -101,14 +81,14 @@ class Countries {
 
 		if ($this->strict || $results)
 		{
-			return $this->formatResults($results);
+			return $results;
 		}
 
 		if (v::not(v::intVal())->validate($term))
 		{
 			$results = $this->search($term);;
 
-			return $this->formatResults($results);
+			return $results;
 		}
 
 		return null;
@@ -138,7 +118,7 @@ class Countries {
 			$results = $this->findByKey('iso3', $term);
 		}
 
-		return $this->formatResults($results);
+		return $results;
 	}
 
 	/**
@@ -154,7 +134,7 @@ class Countries {
 
 		$results = $this->findByKey('name', $term);
 
-		return $this->formatResults($results);
+		return $results;
 	}
 
 	private function getNameFromISO($iso)
@@ -174,7 +154,7 @@ class Countries {
 	{
 		$results = $this->sort($this->isoDetails);
 
-		return $this->formatResults($results);
+		return $results;
 	}
 
 	/**
@@ -413,32 +393,5 @@ class Countries {
 		}
 
 		return $return;
-	}
-
-	/**
-	 * @param $results
-	 *
-	 * @return null|array
-	 */
-	private function formatResults($results)
-	{
-		if ($results === null)
-		{
-			return null;
-		}
-
-		foreach ($results as $key => $item)
-		{
-			if (is_array($item))
-			{
-				$results[ $key ] = $this->formatResults($item);
-			}
-			elseif (!in_array($key, $this->pref))
-			{
-				unset($results[ $key ]);
-			}
-		}
-
-		return $results;
 	}
 }
