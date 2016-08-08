@@ -130,9 +130,14 @@ class Countries {
 	 */
 	public function getCountryFromName($term)
 	{
-		v::stringType()->notEmpty()->assert($term);
-
-		$results = $this->findByKey('name', $term);
+		if (v::stringType()->notEmpty()->validate($term))
+		{
+			$results = $this->findByKey('name', $term);
+		}
+		else
+		{
+			$results = null;
+		}
 
 		return $results;
 	}
@@ -195,7 +200,10 @@ class Countries {
 	 */
 	public function validate($expected, $term)
 	{
-		v::stringType()->length(2, 3)->assert($expected);
+		if (!v::stringType()->length(2, 3)->validate($expected))
+		{
+			return false;
+		}
 
 		$key    = 'iso' . strlen($expected);
 		$result = $this->getCountry($term);

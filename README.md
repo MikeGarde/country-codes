@@ -47,12 +47,21 @@ $results   = $countries->getAllCountries();
 return json_encode($results);
 ```
 
-US Territory?
+US Territory
 
 ```php
 $countries = new Countries(true);
 if ($countries->isUSTerritory('PR'))
 {
     echo 'Yep, a US Territory';
+}
+```
+
+Do something for Canada
+
+```php
+if ($countries->validate('CA', $order['consignee']['countryCode']))
+{
+    echo 'Blame Canada';
 }
 ```

@@ -124,6 +124,7 @@ class countryTest extends TestCase {
 		$this->assertTrue($countries->validate('US', 'United States'));
 		$this->assertTrue($countries->validate('USA', 'United States'));
 		$this->assertFalse($countries->validate('US', 'Canada'));
+		$this->assertFalse($countries->validate('', ''));
 	}
 
 	public function testIsValid()
@@ -178,5 +179,6 @@ class countryTest extends TestCase {
 		$this->assertTrue($countries->isUSTerritory('American Samoa'));
 		$this->assertTrue($countries->isUSTerritory('PR'));
 		$this->assertFalse($countries->isUSTerritory('Canada'));
+		$this->assertFalse($countries->isUSTerritory(''));
 	}
 }
