@@ -1,9 +1,5 @@
 <?php namespace Countries;
 
-use Respect\Validation\Exceptions\CountryCodeException;
-use Respect\Validation\Validator as v;
-use Respect\Validation\Exceptions\ComponentException;
-
 /**
  * This package is licensed under GPL-3.0
  *
@@ -37,11 +33,16 @@ class Countries {
 	/**
 	 * Countries constructor.
 	 *
-	 * @param bool  $strict
+	 * @param bool $strict
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct($strict = false)
 	{
-		v::type('bool')->assert($strict);
+		if (!is_bool($strict))
+		{
+			throw new \Exception('strict must be boolean');
+		}
 
 		$this->strict     = $strict;
 		$this->isoDetails = include 'isoDetails.php';
@@ -51,10 +52,15 @@ class Countries {
 	 * Set the preferred sort order of returned countries
 	 *
 	 * @param $key
+	 *
+	 * @throws \Exception
 	 */
 	public function setSort($key)
 	{
-		v::contains($key)->assert($this->availSort);
+		if (!in_array($key, $this->availSort))
+		{
+			throw new \Exception('sort must be one of the following: ' . implode(',', $this->availSort));
+		}
 
 		$this->sortOrder = $key;
 	}
@@ -70,7 +76,7 @@ class Countries {
 	{
 		$results = null;
 
-		if (v::stringType()->length(2, 3)->validate($term))
+		if (preg_match('/^[a-z]{2,3}$/i', $term))
 		{
 			$results = $this->getCountryFromISO($term);
 		}
@@ -84,7 +90,7 @@ class Countries {
 			return $results;
 		}
 
-		if (v::not(v::intVal())->validate($term))
+		if (!is_int($term))
 		{
 			$results = $this->search($term);;
 
@@ -100,12 +106,16 @@ class Countries {
 	 * @param $term
 	 *
 	 * @return null|array
+	 * @throws \Exception
 	 */
 	public function getCountryFromISO($term)
 	{
-		v::stringType()->length(2, 3)->assert($term);
+		if (!preg_match('/^[a-z0-9]{2,3}$/i', $term))
+		{
+			throw new \Exception('Must use 2-3 letter country code');
+		}
 
-		if (v::intVal()->validate($term))
+		if (is_int($term))
 		{
 			$results = $this->findByKey('isoNum', $term);
 		}
@@ -130,7 +140,7 @@ class Countries {
 	 */
 	public function getCountryFromName($term)
 	{
-		if (v::stringType()->notEmpty()->validate($term))
+		if ($term)
 		{
 			$results = $this->findByKey('name', $term);
 		}
@@ -200,7 +210,7 @@ class Countries {
 	 */
 	public function validate($expected, $term)
 	{
-		if (!v::stringType()->length(2, 3)->validate($expected))
+		if (!preg_match('/^[a-z0-9]{2,3}$/i', $expected))
 		{
 			return false;
 		}
@@ -216,18 +226,24 @@ class Countries {
 	 * @param $term
 	 *
 	 * @return bool
-	 * @throws ComponentException
+	 * @throws \Exception
 	 */
 	public function assert($expected, $term)
 	{
-		v::stringType()->length(2, 3)->assert($expected);
+		$exceptionMsg = sprintf('"%s" is not a valid country within ISO 3166-1', $term);
+
+		if (!preg_match('/^[a-z0-9]{2,3}$/i', $expected))
+		{
+			throw new \Exception($exceptionMsg);
+		}
 
 		$key    = 'iso' . strlen($expected);
 		$result = $this->getCountry($term);
 
 		// Utilizes Respect/Validation for consistency is thrown errors
-		if ($expected != $result[ $key ]) {
-			throw new ComponentException(sprintf('"%s" is not a valid country within ISO 3166-1', $term));
+		if ($expected != $result[ $key ])
+		{
+			throw new \Exception($exceptionMsg);
 		}
 
 		return true;
@@ -237,13 +253,14 @@ class Countries {
 	 * @param $term
 	 *
 	 * @return bool
-	 * @throws ComponentException
+	 * @throws \Exception
 	 */
 	public function assertValid($term)
 	{
 		// Utilizes Respect/Validation for consistency is thrown errors
-		if (!$this->getCountry($term)) {
-			throw new ComponentException(sprintf('"%s" is not a valid country within ISO 3166-1', $term));
+		if (!$this->getCountry($term))
+		{
+			throw new \Exception(sprintf('"%s" is not a valid country within ISO 3166-1', $term));
 		}
 
 		return true;

@@ -2,9 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 use Countries\Countries;
-use Respect\Validation\Validator as v;
-use Respect\Validation\Exceptions\AllOfException;
-use Respect\Validation\Exceptions\ComponentException;
 
 class countryTest extends TestCase {
 
@@ -15,27 +12,27 @@ class countryTest extends TestCase {
 
 	public function testExceptionConstruction()
 	{
-		$this->expectException(AllOfException::class);
+		$this->expectException(Exception::class);
 		new Countries('fail - string');
 	}
 
 	public function testExceptionConstruction2()
 	{
-		$this->expectException(AllOfException::class);
+		$this->expectException(Exception::class);
 		new Countries(['fail', 'array']);
 	}
 
 	public function testAltSpellings()
 	{
-		$altSpellings = include 'src/altSpellings.php';
+		$altSpellings = include '../src/altSpellings.php';
 
 		foreach ($altSpellings as $alt => $iso)
 		{
 			$msg = '"%s" alt spelling "%s" has capitalization issues';
 			$msg = sprintf($msg, $iso, $alt);
 
-			$this->assertTrue(v::stringType()->lowercase()->validate($alt), $msg);
-			$this->assertTrue(v::stringType()->uppercase()->validate($iso), $msg);
+			$this->assertTrue(preg_match('/[A-Z]/', $alt) === 0, $msg);
+			$this->assertTrue(preg_match('/^[A-Z]{2}$/', $iso) === 1, $msg);
 
 			$msg = '"%s" alt spelling "%s" has punctuation issues';
 			$msg = sprintf($msg, $iso, $alt);
@@ -112,7 +109,7 @@ class countryTest extends TestCase {
 
 	public function testBadSortOrder()
 	{
-		$this->expectException(AllOfException::class);
+		$this->expectException(Exception::class);
 		$countries = new Countries();
 		$countries->setSort('bad');
 	}
@@ -125,6 +122,7 @@ class countryTest extends TestCase {
 		$this->assertTrue($countries->validate('USA', 'United States'));
 		$this->assertFalse($countries->validate('US', 'Canada'));
 		$this->assertFalse($countries->validate('', ''));
+		$this->assertTrue($countries->validate('SX', 'Sint Maarten'));
 	}
 
 	public function testIsValid()
@@ -144,7 +142,7 @@ class countryTest extends TestCase {
 
 	public function testAssertionFail()
 	{
-		$this->expectException(ComponentException::class);
+		$this->expectException(Exception::class);
 
 		$countries = new Countries();
 		$countries->assert('ZZ', 'United States');
@@ -159,7 +157,7 @@ class countryTest extends TestCase {
 
 	public function testAssertValidFail()
 	{
-		$this->expectException(ComponentException::class);
+		$this->expectException(Exception::class);
 
 		$countries = new Countries();
 		$countries->assertValid('Not A Country (yet)');
