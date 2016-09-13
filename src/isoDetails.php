@@ -981,7 +981,7 @@ return [
 		'isUS'    => 0,
 	],
 	[
-		'name'    => 'South Georgia and the South Sa',
+		'name'    => 'South Georgia and the South Sandwich Islands',
 		'iso2'    => 'GS',
 		'iso3'    => 'SGS',
 		'isoNum'  => '239',
@@ -1047,7 +1047,7 @@ return [
 		'isUS'    => 0,
 	],
 	[
-		'name'    => 'Heard Island and McDonald Isla',
+		'name'    => 'Heard Island and McDonald Island',
 		'iso2'    => 'HM',
 		'iso3'    => 'HMD',
 		'isoNum'  => '334',
