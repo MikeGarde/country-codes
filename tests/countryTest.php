@@ -24,7 +24,7 @@ class countryTest extends TestCase {
 
 	public function testAltSpellings()
 	{
-		$altSpellings = include '../src/altSpellings.php';
+		$altSpellings = include 'src/altSpellings.php';
 
 		foreach ($altSpellings as $alt => $iso)
 		{

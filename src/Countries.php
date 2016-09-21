@@ -45,7 +45,7 @@ class Countries {
 		}
 
 		$this->strict     = $strict;
-		$this->isoDetails = include 'isoDetails.php';
+		$this->isoDetails = include '3166_1.php';
 	}
 
 	/**

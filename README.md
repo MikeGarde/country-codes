@@ -1,6 +1,8 @@
-# Country Codes
+# Country Codes & US States
 
-### Install
+ISO 3166-1, 3166-2-US
+
+## Install
 
 Find on [Packagist](https://packagist.org/packages/mikegarde/country-codes),
 and install using [Composer](http://getcomposer.org).
@@ -9,7 +11,9 @@ and install using [Composer](http://getcomposer.org).
 composer require mikegarde/country-codes
 ```
 
-### Use
+## Use
+
+### Country Codes
 
 ```php
 include 'vendor/autoload.php';
@@ -63,5 +67,22 @@ Do something for Canada
 if ($countries->validate('CA', $order['consignee']['countryCode']))
 {
     echo 'Blame Canada';
+}
+```
+
+### US States
+
+Do something different when shipping outside the lower 48
+
+```php
+$stateTest = new US();
+
+if ($stateTest->isCONUS($order['consignee']['state']))
+{
+    echo 'You can select USPS, UPS, or DHL';
+}
+else // OCONUS
+{
+   echo 'USPS is your only option for shipping to AK, HI, APO, or an FPO address'; 
 }
 ```
