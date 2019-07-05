@@ -8,6 +8,7 @@ class usTest extends TestCase {
 	public function testConstruction()
 	{
 		new US();
+		$this->assertTrue(true);
 	}
 
 	public function testExceptionConstruction()

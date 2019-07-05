@@ -8,6 +8,7 @@ class countryTest extends TestCase {
 	public function testConstruction()
 	{
 		new Countries();
+		$this->assertTrue(true);
 	}
 
 	public function testExceptionConstruction()

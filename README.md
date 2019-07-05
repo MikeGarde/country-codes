@@ -1,3 +1,10 @@
+![Packagist](https://img.shields.io/packagist/dt/mikegarde/country-codes.svg)
+![Packagist](https://img.shields.io/packagist/dd/mikegarde/country-codes.svg)
+![GitHub](https://img.shields.io/github/license/mikegarde/country-codes.svg)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/mikegarde/country-codes.svg)
+![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/mikegarde/country-codes.svg)
+![Travis (.org)](https://img.shields.io/travis/mikegarde/country-codes.svg)
+
 # Country Codes & US States
 
 ISO 3166-1, 3166-2-US
@@ -83,6 +90,15 @@ if ($stateTest->isCONUS($order['consignee']['state']))
 }
 else // OCONUS
 {
-   echo 'USPS is your only option for shipping to AK, HI, APO, or an FPO address'; 
+   echo 'USPS is your only option for shipping to AK, HI, APO, or an FPO address';
 }
+```
+
+## Local Development Notes
+
+```shell
+docker build . -t php:7.3
+
+docker run --rm -it -v $(pwd):/app php:7.3 composer install
+docker run --rm -it -v $(pwd):/app php:7.3 php ./vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 ```
