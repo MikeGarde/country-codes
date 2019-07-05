@@ -1,0 +1,16 @@
+language: php
+php:
+  - '5.6'
+  - '7.0'
+  - '7.1'
+  - '7.2'
+  - '7.3'
+before_install:
+    - composer self-update
+    - composer --version
+    - wget https://phar.phpunit.de/phpunit.phar
+    - php phpunit.phar --version
+    - composer validate
+    - composer install
+script:
+    - php phpunit.phar --coverage-clover=coverage.clover --colors  --bootstrap "./vendor/autoload.php" tests

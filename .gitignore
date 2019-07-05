@@ -8,3 +8,4 @@ composer.lock
 .idea/modules.xml
 .idea/vcs.xml
 .idea/workspace.xml
+.phpunit.result.cache
