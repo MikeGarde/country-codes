@@ -8,9 +8,7 @@ php:
 before_install:
     - composer self-update
     - composer --version
-    - wget https://phar.phpunit.de/phpunit.phar
-    - php phpunit.phar --version
     - composer validate
     - composer install
 script:
-    - php phpunit.phar --coverage-clover=coverage.clover --colors  --bootstrap "./vendor/autoload.php" tests
+    - php ./vendor/bin/phpunit --bootstrap vendor/autoload.php tests
