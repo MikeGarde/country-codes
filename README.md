@@ -1,6 +1,7 @@
 [![Packagist](https://img.shields.io/packagist/dt/mikegarde/country-codes.svg)](https://packagist.org/packages/mikegarde/country-codes)
 [![Packagist](https://img.shields.io/packagist/dd/mikegarde/country-codes.svg)](https://packagist.org/packages/mikegarde/country-codes)
 [![GitHub](https://img.shields.io/github/license/mikegarde/country-codes.svg)](https://github.com/MikeGarde/country-codes)
+[![PHP from Travis config](https://img.shields.io/travis/php-v/mikegarde/country-codes.svg)](https://travis-ci.org/MikeGarde/country-codes)
 [![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/mikegarde/country-codes.svg)](https://github.com/MikeGarde/country-codes)
 [![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/mikegarde/country-codes.svg)](http://bit.ly/2Yuoi8w)
 [![Travis (.org)](https://img.shields.io/travis/mikegarde/country-codes.svg)](https://travis-ci.org/MikeGarde/country-codes)
