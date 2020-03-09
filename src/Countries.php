@@ -277,7 +277,7 @@ class Countries {
 	{
 		$result = $this->getCountry($term);
 
-		return ($result['isUS']) ? true : false;
+		return (null !== $result && $result['isUS']) ? true : false;
 	}
 
 	/**
