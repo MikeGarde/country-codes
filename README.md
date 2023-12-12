@@ -98,8 +98,9 @@ else // OCONUS
 ## Local Development Notes
 
 ```shell
-docker build . -t php:7.4
+docker build . -t php:8.2
 
-docker run --rm -it -v $(pwd):/app php:7.4 composer install
-docker run --rm -it -v $(pwd):/app php:7.4 php ./vendor/bin/phpunit --bootstrap vendor/autoload.php tests
+docker run --rm -it -v $(pwd):/app php:8.2 composer install
+docker run --rm -it -v $(pwd):/app php:8.2 composer test
+docker run --rm -it -v $(pwd):/app php:8.2 composer phpcs
 ```
