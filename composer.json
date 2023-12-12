@@ -2,7 +2,7 @@
   "name": "mikegarde/country-codes",
   "description": "ISO 3166-1 Country Codes",
   "type": "library",
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-only",
   "authors": [
     {
       "name": "Mike Garde",
