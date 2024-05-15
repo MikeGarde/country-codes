@@ -1,0 +1,46 @@
+version: '3'
+vars:
+  DEFAULT_PHP_VERSION: "8.3"
+tasks:
+  build:
+    vars:
+      PHP_VERSION: '{{default .DEFAULT_PHP_VERSION .PHP_VERSION}}'
+    cmds:
+      - docker build --build-arg PHP_VERSION={{.PHP_VERSION}} -t cc:{{.PHP_VERSION}} .
+  build-*:
+    vars:
+      PHP_VERSION: '{{index .MATCH 0}}'
+    cmds:
+      - task: build
+        vars: { PHP_VERSION: "{{.PHP_VERSION}}" } 
+    silent: true
+  docker-run:
+    vars:
+      COMMAND: '{{.COMMAND}}'
+      PHP_VERSION: '{{default .DEFAULT_PHP_VERSION .PHP_VERSION}}'
+    cmds:
+      - docker run --rm -it -v $(pwd):/app cc:{{.PHP_VERSION}} composer {{.COMMAND}}
+  setup-*:
+    vars:
+      PHP_VERSION: '{{index .MATCH 0}}'
+    cmds:
+      - rm -f composer.lock 2> /dev/null
+      - task: docker-run
+        vars: { COMMAND: "install", PHP_VERSION: "{{.PHP_VERSION}}" } 
+  test-*:
+    vars:
+      PHP_VERSION: '{{index .MATCH 0}}'
+    cmds:
+      - task: docker-run
+        vars: { COMMAND: "test", PHP_VERSION: "{{.PHP_VERSION}}" } 
+      - task: docker-run
+        vars: { COMMAND: "phpcs", PHP_VERSION: "{{.PHP_VERSION}}" } 
+  test-all:
+    cmds:
+        - |
+          VERSIONS=("8.0" "8.1" "8.2" "8.3")
+          for VERSION in "${VERSIONS[@]}"; do
+            task build-$VERSION
+            task setup-$VERSION
+            task test-$VERSION
+          done

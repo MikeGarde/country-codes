@@ -1,4 +1,5 @@
-FROM php:8.2-fpm
+ARG PHP_VERSION
+FROM php:${PHP_VERSION}-fpm
 
 RUN apt-get update
 RUN apt-get install -y git zip unzip libzip-dev libmcrypt-dev --no-install-recommends

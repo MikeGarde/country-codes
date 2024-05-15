@@ -95,10 +95,12 @@ else // OCONUS
 
 ## Local Development Notes
 
-```shell
-docker build . -t php:8.2
+The numeric value after the command represents the PHP version
 
-docker run --rm -it -v $(pwd):/app php:8.2 composer install
-docker run --rm -it -v $(pwd):/app php:8.2 composer test
-docker run --rm -it -v $(pwd):/app php:8.2 composer phpcs
+```shell
+task build-8.3
+task setup-8.3
+task test-8.3
 ```
+
+Alternatively you can run `task test-all` to build, setup, and test against all supported PHP versions.
