@@ -48,3 +48,10 @@ jobs:
 
       - name: Run tests
         run: composer run-script test
+
+      - name: Upload coverage reports to Codecov
+        if: ${{ matrix.php == '8.3' }}
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./tmp/clover.xml
