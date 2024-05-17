@@ -3,12 +3,15 @@ FROM php:${PHP_VERSION}-fpm
 
 RUN apt-get update
 RUN apt-get install -y git zip unzip libzip-dev libmcrypt-dev --no-install-recommends
-RUN docker-php-ext-install zip
-RUN docker-php-ext-configure zip
-RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
-    && curl -o /tmp/composer-setup.sig https://composer.github.io/installer.sig \
-    && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
-    && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer \
-    && rm -f /tmp/composer-setup.*
+
+# See: https://github.com/mlocati/docker-php-extension-installer
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN chmod +x /usr/local/bin/install-php-extensions && sync
+RUN install-php-extensions \
+    @composer xdebug zip
+
+COPY config/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+RUN rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN touch /var/log/xdebug.log && chmod a+rw /var/log/xdebug.log
 
 WORKDIR /app/

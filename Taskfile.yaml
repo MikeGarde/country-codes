@@ -20,6 +20,18 @@ tasks:
       PHP_VERSION: '{{default .DEFAULT_PHP_VERSION .PHP_VERSION}}'
     cmds:
       - docker run --rm -it -v $(pwd):/app cc:{{.PHP_VERSION}} composer {{.COMMAND}}
+  exec:
+    vars:
+      PHP_VERSION: '{{default .DEFAULT_PHP_VERSION .PHP_VERSION}}'
+    cmds:
+      - docker run --rm -it -v $(pwd):/app cc:{{.PHP_VERSION}} bash
+  exec-*:
+    vars:
+      PHP_VERSION: '{{index .MATCH 0}}'
+    cmds:
+      - task: exec
+        vars: { PHP_VERSION: "{{.PHP_VERSION}}" }
+    silent: true
   setup-*:
     vars:
       PHP_VERSION: '{{index .MATCH 0}}'
@@ -32,15 +44,22 @@ tasks:
       PHP_VERSION: '{{index .MATCH 0}}'
     cmds:
       - task: docker-run
-        vars: { COMMAND: "test", PHP_VERSION: "{{.PHP_VERSION}}" } 
+        vars: { COMMAND: "test", PHP_VERSION: "{{.PHP_VERSION}}" }
       - task: docker-run
-        vars: { COMMAND: "phpcs", PHP_VERSION: "{{.PHP_VERSION}}" } 
+        vars: { COMMAND: "phpcs", PHP_VERSION: "{{.PHP_VERSION}}" }
   test-all:
     cmds:
         - |
-          VERSIONS=("8.0" "8.1" "8.2" "8.3")
+          VERSIONS=("7.4" "8.0" "8.1" "8.2" "8.3")
           for VERSION in "${VERSIONS[@]}"; do
             task build-$VERSION
             task setup-$VERSION
             task test-$VERSION
           done
+          cat ./tmp/coverage.txt
+  test-cs:
+    cmds:
+      - task: docker-run
+        vars: { COMMAND: "install --dev squizlabs/php_codesniffer" }
+      - task: docker-run
+        vars: { COMMAND: "phpcs" } 

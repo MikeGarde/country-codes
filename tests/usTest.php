@@ -55,6 +55,13 @@ class usTest extends TestCase {
 		$this->assertTrue(null === $stateTest->isCONUS('Bad'));
 	}
 
+	public function testGetAllStates()
+	{
+		$states = new US();
+
+		$this->assertGreaterThan(50, $states->getAllStates());
+	}
+
 	public function testTypicalStates()
 	{
 		$stateTest = new US();
@@ -63,5 +70,13 @@ class usTest extends TestCase {
 		//  1 Washington DC (district)
 		//  3 US Armed Forces Abbreviations
 		$this->assertCount(54, $stateTest->getTypicalStates());
+	}
+
+	public function getInvalidState()
+	{
+		$stateTest = new US();
+
+		$this->assertNull($stateTest->getState(123));
+		$this->assertNull($stateTest->getState('0'));
 	}
 }
