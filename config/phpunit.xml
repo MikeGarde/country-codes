@@ -1,0 +1,31 @@
+<?xml     version                   = "1.0" encoding                                     = "UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.1/phpunit.xsd"
+         colors="true"
+         cacheDirectory=".phpunit.cache">
+    <coverage includeUncoveredFiles="true"
+              pathCoverage="false"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="true">
+        <report>
+            <html outputDirectory="./tmp/html-coverage"
+                  lowUpperBound="50"
+                  highLowerBound="90"/>
+            <text outputFile="./tmp/coverage.txt"
+                  showUncoveredFiles="true"/>
+        </report>
+    </coverage>
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory prefix="3166_">src</directory>
+        </exclude>
+    </source>
+    <testsuites>
+        <testsuite name="country tests">
+            <directory>./tests/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
