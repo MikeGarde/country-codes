@@ -43,16 +43,8 @@ class US
 
     public function getState($term)
     {
-        if (!preg_match('/[a-z]/i', $term)) {
-            return null;
-        }
-
         if ($results = $this->getExactMatch($term)) {
             return $results;
-        }
-
-        if ($this->strict) {
-            return null;
         }
 
         return null;

@@ -2,6 +2,8 @@
 
 namespace Countries;
 
+use Exception;
+
 /**
  * This package is licensed under GPL-3.0
  *
@@ -16,8 +18,8 @@ namespace Countries;
  */
 class Countries
 {
-    private $sortOrder = 'name';
-    private $availSort = [
+    private string $sortOrder = 'name';
+    private array  $availSort = [
         'name',
         'iso2',
         'iso3',
@@ -28,23 +30,17 @@ class Countries
         'isUK',
         'isUS',
     ];
-    private $strict    = false;
-    private $isoDetails;
-    private $altSpellings;
+    private bool   $strict    = false;
+    private array  $isoDetails;
+    private array  $altSpellings;
 
     /**
      * Countries constructor.
      *
      * @param bool $strict
-     *
-     * @throws \Exception
      */
-    public function __construct($strict = false)
+    public function __construct(bool $strict = false)
     {
-        if (!is_bool($strict)) {
-            throw new \Exception('strict must be boolean');
-        }
-
         $this->strict     = $strict;
         $this->isoDetails = include '3166_1.php';
     }
@@ -54,15 +50,18 @@ class Countries
      *
      * @param $key
      *
-     * @throws \Exception
+     * @return Countries
+     * @throws Exception
      */
-    public function setSort($key)
+    public function setSort($key): Countries
     {
         if (!in_array($key, $this->availSort)) {
-            throw new \Exception('sort must be one of the following: ' . implode(',', $this->availSort));
+            throw new Exception('sort must be one of the following: ' . implode(',', $this->availSort));
         }
 
         $this->sortOrder = $key;
+
+        return $this;
     }
 
     /**
@@ -71,11 +70,10 @@ class Countries
      * @param $term
      *
      * @return null|array
+     * @throws Exception
      */
-    public function getCountry($term)
+    public function getCountry($term): ?array
     {
-        $results = null;
-
         if (preg_match('/^[a-z]{2,3}$/i', $term)) {
             $results = $this->getCountryFromISO($term);
         } else {
@@ -96,18 +94,19 @@ class Countries
     /**
      * Provide 2 or 3 letter ISO and get the country
      *
-     * @param $term
+     * @param srring|int $term
      *
      * @return null|array
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getCountryFromISO($term)
+    public function getCountryFromISO($term): ?array
     {
         if (!preg_match('/^[a-z0-9]{2,3}$/i', $term)) {
-            throw new \Exception('Must use 2-3 letter country code');
+            throw new Exception('Must use 2-3 letter country code');
         }
 
-        if (is_int($term)) {
+        if (is_numeric($term)) {
+            $term    = str_pad($term, 3, "0", STR_PAD_LEFT);
             $results = $this->findByKey('isoNum', $term);
         } elseif (strlen($term) == 2) {
             $results = $this->findByKey('iso2', $term);
@@ -125,7 +124,7 @@ class Countries
      *
      * @return null|array
      */
-    public function getCountryFromName($term)
+    public function getCountryFromName($term): ?array
     {
         if ($term) {
             $results = $this->findByKey('name', $term);
@@ -136,24 +135,22 @@ class Countries
         return $results;
     }
 
-    private function getNameFromISO($iso)
-    {
-    }
-
-    private function getISOFromName($name)
-    {
-    }
+    //    private function getNameFromISO($iso)
+    //    {
+    //    }
+    //
+    //    private function getISOFromName($name)
+    //    {
+    //    }
 
     /**
      * All countries
      *
      * @return array
      */
-    public function getAllCountries()
+    public function getAllCountries(): array
     {
-        $results = $this->sort($this->isoDetails);
-
-        return $results;
+        return $this->sort($this->isoDetails);
     }
 
     /**
@@ -161,7 +158,7 @@ class Countries
      *
      * @return array
      */
-    public function getAllCountryNames()
+    public function getAllCountryNames(): array
     {
         $results = [];
 
@@ -170,9 +167,8 @@ class Countries
         }
 
         asort($results);
-        $results = $this->stripKey($results);
 
-        return $results;
+        return $this->stripKey($results);
     }
 
     /**
@@ -180,9 +176,13 @@ class Countries
      *
      * @return bool
      */
-    public function valid($term)
+    public function valid($term): bool
     {
-        return ($this->getCountry($term)) ? true : false;
+        try {
+            return (bool)$this->getCountry($term);
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -191,7 +191,7 @@ class Countries
      *
      * @return bool
      */
-    public function validate($expected, $term)
+    public function validate($expected, $term): bool
     {
         if (!preg_match('/^[a-z0-9]{2,3}$/i', $expected)) {
             return false;
@@ -200,7 +200,7 @@ class Countries
         $key    = 'iso' . strlen($expected);
         $result = $this->getCountry($term);
 
-        return ($expected == $result[$key]) ? true : false;
+        return $expected == $result[$key];
     }
 
     /**
@@ -208,14 +208,14 @@ class Countries
      * @param $term
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
-    public function assert($expected, $term)
+    public function assert($expected, $term): bool
     {
         $exceptionMsg = sprintf('"%s" is not a valid country within ISO 3166-1', $term);
 
         if (!preg_match('/^[a-z0-9]{2,3}$/i', $expected)) {
-            throw new \Exception($exceptionMsg);
+            throw new Exception($exceptionMsg);
         }
 
         $key    = 'iso' . strlen($expected);
@@ -223,7 +223,7 @@ class Countries
 
         // Utilizes Respect/Validation for consistency is thrown errors
         if ($expected != $result[$key]) {
-            throw new \Exception($exceptionMsg);
+            throw new Exception($exceptionMsg);
         }
 
         return true;
@@ -233,13 +233,13 @@ class Countries
      * @param $term
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
-    public function assertValid($term)
+    public function assertValid($term): bool
     {
         // Utilizes Respect/Validation for consistency is thrown errors
         if (!$this->getCountry($term)) {
-            throw new \Exception(sprintf('"%s" is not a valid country within ISO 3166-1', $term));
+            throw new Exception(sprintf('"%s" is not a valid country within ISO 3166-1', $term));
         }
 
         return true;
@@ -252,11 +252,11 @@ class Countries
      *
      * @return bool
      */
-    public function isUSTerritory($term)
+    public function isUSTerritory($term): bool
     {
         $result = $this->getCountry($term);
 
-        return (null !== $result && $result['isUS']) ? true : false;
+        return null !== $result && $result['isUS'];
     }
 
     /**
@@ -265,8 +265,9 @@ class Countries
      * @param $term
      *
      * @return null
+     * @throws Exception
      */
-    private function search($term)
+    private function search($term): ?array
     {
         $term = strtolower($term);
         $term = preg_replace('/[^a-z ]+/', '', $term);
@@ -327,12 +328,12 @@ class Countries
     }
 
     /**
-     * @param $key  Key to search
-     * @param $term Term to search for
+     * @param $key  string Key to search
+     * @param $term string Term to search for
      *
-     * @return null
+     * @return array|null
      */
-    private function findByKey($key, $term)
+    private function findByKey(string $key, string $term): ?array
     {
         foreach ($this->isoDetails as $details) {
             if ($details[$key] == $term) {
@@ -350,7 +351,7 @@ class Countries
      *
      * @return array
      */
-    private function sort($array)
+    private function sort($array): array
     {
         $return = [];
         $key    = $this->sortOrder;
@@ -371,7 +372,7 @@ class Countries
      *
      * @return array
      */
-    private function stripKey($array)
+    private function stripKey($array): array
     {
         $return = [];
 
