@@ -13,6 +13,7 @@
                   highLowerBound="90"/>
             <text outputFile="./tmp/coverage.txt"
                   showUncoveredFiles="true"/>
+            <clover outputFile="./tmp/clover.xml"/>
         </report>
     </coverage>
     <source>
