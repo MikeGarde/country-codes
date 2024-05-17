@@ -3,6 +3,7 @@
 [![GitHub](https://img.shields.io/github/license/mikegarde/country-codes.svg)](https://github.com/MikeGarde/country-codes)
 [![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/mikegarde/country-codes.svg)](https://github.com/MikeGarde/country-codes)
 [![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/mikegarde/country-codes.svg)](http://bit.ly/2Yuoi8w)
+[![codecov](https://codecov.io/github/MikeGarde/country-codes/graph/badge.svg?token=EKO1IUVFV3)](https://codecov.io/github/MikeGarde/country-codes)
 
 # Country Codes & US States
 
