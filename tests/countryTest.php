@@ -6,123 +6,121 @@ use Countries\Countries;
 class countryTest extends TestCase
 {
 
-    public function testConstruction()
-    {
-        new Countries();
-        $this->assertTrue(true);
-    }
+	public function testConstruction()
+	{
+		new Countries();
+		$this->assertTrue(true);
+	}
 
-    public function testAltSpellings()
-    {
-        $altSpellings = include 'src/altSpellings.php';
+	public function testGetCountry1()
+	{
+		$countries = new Countries();
+		$result    = $countries->getCountry('United States');
 
-        foreach ($altSpellings as $alt => $iso)
-        {
-            $msg = '"%s" alt spelling "%s" has capitalization issues';
-            $msg = sprintf($msg, $iso, $alt);
+		$this->assertEquals('US', $result->iso2);
+	}
 
-            $this->assertTrue(preg_match('/[A-Z]/', $alt) === 0, $msg);
-            $this->assertTrue(preg_match('/^[A-Z]{2}$/', $iso) === 1, $msg);
+	public function testGetCountry2()
+	{
+		$countries = new Countries();
 
-            $msg = '"%s" alt spelling "%s" has punctuation issues';
-            $msg = sprintf($msg, $iso, $alt);
+		$results = $countries->getCountry('United States of America');
+		$this->assertEquals('US', $results->iso2);
 
-            $this->assertTrue(preg_match('/^[a-z ]+$/', $alt) === 1, $msg);
-        }
-    }
+		$results = $countries->getCountry('UnitedStates');
+		$this->assertEquals('US', $results->iso2);
 
-    public function testGetCountry1()
-    {
-        $countries = new Countries();
-        $results   = $countries->getCountry('United States');
+		$results = $countries->getCountry('Canida');
+		$this->assertEquals('CA', $results->iso2);
 
-        $this->assertEquals('US', $results['iso2']);
-    }
+		$results = $countries->getCountry('Kyrgyztan');
+		$this->assertEquals('KG', $results->iso2);
 
-    public function testGetCountry2()
-    {
-        $countries = new Countries();
+		$results = $countries->getCountry('St Maarten');
+		$this->assertEquals('SX', $results->iso2);
+	}
 
-        $results = $countries->getCountry('United States of America');
-        $this->assertEquals('US', $results['iso2']);
+	public function testGetCountry3()
+	{
+		$countries = new Countries();
 
-        $results = $countries->getCountry('UnitedStates');
-        $this->assertEquals('US', $results['iso2']);
+		$results = $countries->getCountry('Vatican');
+		$this->assertEquals('VA', $results->iso2);
 
-        $results = $countries->getCountry('Canida');
-        $this->assertEquals('CA', $results['iso2']);
+		$results = $countries->getCountry('Lao People\'s Democratic Republic');
+		$this->assertEquals('LA', $results->iso2);
 
-        $results = $countries->getCountry('Kyrgyztan');
-        $this->assertEquals('KG', $results['iso2']);
+	}
 
-        $results = $countries->getCountry('St Maarten');
-        $this->assertEquals('SX', $results['iso2']);
-    }
+	public function testConvertToArray()
+	{
+		$countries = new Countries();
 
-    public function testGetCountry3()
-    {
-        $countries = new Countries();
+		$result = $countries->getCountry('United States')->toArray();
+		$this->assertEquals('United States', $result['name']);
+	}
 
-        $results = $countries->getCountry('Vatican');
-        $this->assertEquals('VA', $results['iso2']);
+	public function testConvertToString()
+	{
+		$countries = new Countries();
 
-        $results = $countries->getCountry('Lao People\'s Democratic Republic');
-        $this->assertEquals('LA', $results['iso2']);
+		$result = $countries->getCountry('United States');
+		$this->assertEquals('US', (string)$result);
+	}
 
-    }
+	public function testInvalidGetCountry()
+	{
+		$countries = new Countries();
 
-    public function testInvalidGetCountry()
-    {
-        $countries = new Countries();
+		$this->assertNull($countries->getCountry('Not A Country'));
+		$this->assertNull($countries->getCountry(5000));
+	}
 
-        $this->assertNull($countries->getCountry('Not A Country'));
-        $this->assertNull($countries->getCountry(5000));
-    }
+	public function testGetAllCountries()
+	{
+		$countries = new Countries();
+		$results   = $countries->getAllCountries();
 
-    public function testGetAllCountries()
-    {
-        $countries = new Countries();
-        $results   = $countries->getAllCountries();
+		$this->assertCount(250, $results);
+	}
 
-        $this->assertCount(250, $results);
-    }
+	public function testGetAllCountryNames()
+	{
+		$countries = new Countries();
+		$results   = $countries->getAllCountryNames();
+		$count     = count($results);
 
-    public function testGetAllCountryNames()
-    {
-        $countries = new Countries();
-        $results   = $countries->getAllCountryNames();
+		$this->assertGreaterThanOrEqual(200, $count);
+		$this->assertContains('United States', $results);
+	}
 
-        $this->assertCount(250, $results);
-        $this->assertContains('United States', $results);
-    }
+	public function testGetCountryFromIso()
+	{
+		$countries    = new Countries();
+		$resultString = $countries->getCountryFromISO('840');
+		$resultNum    = $countries->getCountryFromISO(840);
 
-    public function testGetCountryFromIso()
-    {
-        $countries    = new Countries();
-        $resultString = $countries->getCountryFromISO('840');
-        $resultNum    = $countries->getCountryFromISO(840);
+		$this->assertEquals('840', $resultString->isoNum);
+		$this->assertEquals('840', $resultNum->isoNum);
+	}
 
-        $this->assertEquals('840', $resultString['isoNum']);
-        $this->assertEquals('840', $resultNum['isoNum']);
-    }
+	public function testGetCountryFromIsoFail1()
+	{
+		$countries = new Countries();
 
-    public function testGetCountryFromIsoFail1()
-    {
-        $countries = new Countries();
+		$this->expectException(Exception::class);
 
-        $this->expectException(Exception::class);
+		$countries->getCountryFromISO('TOO_Long');
+	}
 
-        $countries->getCountryFromISO('TOO_Long');
-    }
+	public function testGetCountryFromIsoFail2()
+	{
+		$countries = new Countries();
 
-    public function testGetCountryFromIsoFail2()
-    {
-        $countries = new Countries();
+		$this->expectException(Exception::class);
 
-        $this->expectException(Exception::class);
-
-        $countries->getCountryFromISO(9999);
-    }
+		$countries->getCountryFromISO(9999);
+	}
 
 	public function testSortOrder()
 	{
@@ -130,7 +128,7 @@ class countryTest extends TestCase
 		$countries->setSort('capital');
 		$results = $countries->getAllCountries();
 
-		$this->assertEquals('AE', $results[1]['iso2']);
+		$this->assertEquals('AE', $results[1]->iso2);
 	}
 
 	public function testBadSortOrder()
@@ -164,6 +162,13 @@ class countryTest extends TestCase
 		$countries = new Countries();
 
 		$this->assertTrue($countries->assert('USA', 'United States'));
+	}
+
+	public function testAssertFailBoolean()
+	{
+		$countries = new Countries();
+
+		$this->assertFalse($countries->assert('ZZ', 'United States', false));
 	}
 
 	public function testAssertionFail()
@@ -220,5 +225,23 @@ class countryTest extends TestCase
 
 		$this->assertNull($countries->getCountry('ZZ'));
 		$this->assertNull($countries->getCountry('ZZZ'));
+	}
+
+	public function testAltSpellings()
+	{
+		$altSpellings = include 'src/altSpellings.php';
+
+		foreach ($altSpellings as $alt => $iso) {
+			$msg = '"%s" alt spelling "%s" has capitalization issues';
+			$msg = sprintf($msg, $iso, $alt);
+
+			$this->assertTrue(preg_match('/[A-Z]/', $alt) === 0, $msg);
+			$this->assertTrue(preg_match('/^[A-Z]{2}$/', $iso) === 1, $msg);
+
+			$msg = '"%s" alt spelling "%s" has punctuation issues';
+			$msg = sprintf($msg, $iso, $alt);
+
+			$this->assertTrue(preg_match('/^[a-z ]+$/', $alt) === 1, $msg);
+		}
 	}
 }

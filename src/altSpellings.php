@@ -41,5 +41,4 @@ return [
     'virgin islands british'             => 'VG',
     'virgin islands us'                  => 'VI',
     'wales'                              => 'GB',
-    'western australia'                  => 'AU',
 ];
